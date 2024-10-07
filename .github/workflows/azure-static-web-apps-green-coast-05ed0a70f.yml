@@ -1,9 +1,9 @@
-name: Deploy static website to Azure Web App - MyWebApp0121
+name: Deploy Static Web App to Azure App Service
 
 on:
   push:
     branches:
-      - main
+      - main  # Change this to your branch name if different
   workflow_dispatch:
 
 jobs:
@@ -11,24 +11,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Zip static files for deployment
+      - name: Zip Static Files for Deployment
         run: zip -r release.zip ./*
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: static-website
-          path: release.zip
-
-      - name: Download artifact for deployment job
-        uses: actions/download-artifact@v4
-        with:
-          name: static-website
-
-      - name: Unzip static files
-        run: unzip release.zip
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -37,10 +24,9 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
 
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
+      - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'MyWebApp0121'
+          app-name: 'myproject' 
           slot-name: 'Production'
-          package: .
+          package: release.zip
